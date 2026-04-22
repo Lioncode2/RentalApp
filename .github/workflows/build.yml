@@ -18,11 +18,14 @@ jobs:
       with:
         dotnet-version: '10.0.x'
 
+    - name: Install MAUI workload
+      run: dotnet workload install maui-android
+
     - name: Restore dependencies
       run: dotnet restore StarterApp.sln
 
-    - name: Build
-      run: dotnet build StarterApp.sln --no-restore
+    - name: Build Database project
+      run: dotnet build StarterApp.Database/StarterApp.Database.csproj --no-restore
 
-    - name: Test
-      run: dotnet test StarterApp.Test/StarterApp.Test.csproj --no-build --verbosity normal
+    - name: Run Tests
+      run: dotnet test StarterApp.Test/StarterApp.Test.csproj --verbosity normal
