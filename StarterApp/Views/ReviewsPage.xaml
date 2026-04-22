@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="StarterApp.Views.ReviewsPage"
+             Title="Reviews">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*">
+        <Label Grid.Row="0" Text="{Binding AverageRating, StringFormat='Average Rating: {0:F1}/5'}" FontSize="18" Margin="10"/>
+        <Label Grid.Row="1" Text="Rating (1-5)"/>
+        <Entry Grid.Row="2" Text="{Binding Rating}" Keyboard="Numeric" Margin="10"/>
+        <Entry Grid.Row="3" Text="{Binding Comment}" Placeholder="Leave a comment" Margin="10"/>
+        <Button Grid.Row="4" Text="Submit Review" Command="{Binding SubmitReviewCommand}" Margin="10"/>
+        <CollectionView Grid.Row="5" ItemsSource="{Binding Reviews}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="10,5">
+                        <VerticalStackLayout>
+                            <Label Text="{Binding Rating, StringFormat='{0}/5 ⭐'}"/>
+                            <Label Text="{Binding Comment}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

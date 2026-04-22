@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="StarterApp.Views.RentalsPage"
+             Title="Rentals">
+    <Grid RowDefinitions="Auto,*,*">
+        <Label Grid.Row="0" Text="Incoming Requests" FontSize="18" FontAttributes="Bold" Margin="10"/>
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Incoming}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="10,5" Padding="10">
+                        <VerticalStackLayout>
+                            <Label Text="{Binding Item.Title}" FontAttributes="Bold"/>
+                            <Label Text="{Binding Status}"/>
+                            <Label Text="{Binding TotalPrice, StringFormat='Total: £{0}'}"/>
+                            <HorizontalStackLayout Spacing="10">
+                                <Button Text="Approve" Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ApproveCommand}" CommandParameter="{Binding Id}"/>
+                                <Button Text="Reject" Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RejectCommand}" CommandParameter="{Binding Id}"/>
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <Label Grid.Row="2" Text="My Rentals" FontSize="18" FontAttributes="Bold" Margin="10"/>
+    </Grid>
+</ContentPage>
