@@ -1,7 +1,7 @@
 using Moq;
 using StarterApp.Database.Data.Repositories;
 using StarterApp.Database.Models;
-using StarterApp.Database.Services;
+using StarterApp.Services;
 
 namespace StarterApp.Test;
 
