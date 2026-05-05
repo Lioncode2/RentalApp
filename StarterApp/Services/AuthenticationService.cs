@@ -1,5 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-using StarterApp.Database.Data;
+using StarterApp.Database.Data.Repositories;
 using StarterApp.Database.Models;
 using BCrypt.Net;
 
@@ -7,41 +6,33 @@ namespace StarterApp.Services;
 
 public class AuthenticationService : IAuthenticationService
 {
-    private readonly AppDbContext _context;
+    private readonly IUserRepository _userRepository;
+    private readonly IRoleRepository _roleRepository;
     private User? _currentUser;
     private List<string> _currentUserRoles = new();
 
     public event EventHandler<bool>? AuthenticationStateChanged;
 
-    public AuthenticationService(AppDbContext context)
+    public AuthenticationService(IUserRepository userRepository, IRoleRepository roleRepository)
     {
-        _context = context;
+        _userRepository = userRepository;
+        _roleRepository = roleRepository;
     }
 
     public bool IsAuthenticated => _currentUser != null;
-
     public User? CurrentUser => _currentUser;
-
     public List<string> CurrentUserRoles => _currentUserRoles;
 
     public async Task<AuthenticationResult> LoginAsync(string email, string password)
     {
         try
         {
-            var user = await _context.Users
-                .Include(u => u.UserRoles)
-                .ThenInclude(ur => ur.Role)
-                .FirstOrDefaultAsync(u => u.Email == email && u.IsActive);
-
+            var user = await _userRepository.GetByEmailAsync(email);
             if (user == null)
-            {
                 return new AuthenticationResult(false, "Invalid email or password");
-            }
 
             if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
-            {
                 return new AuthenticationResult(false, "Invalid email or password");
-            }
 
             _currentUser = user;
             _currentUserRoles = user.UserRoles
@@ -62,18 +53,13 @@ public class AuthenticationService : IAuthenticationService
     {
         try
         {
-            // Check if user already exists
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-            if (existingUser != null)
-            {
+            var existing = await _userRepository.GetByEmailAsync(email);
+            if (existing != null)
                 return new AuthenticationResult(false, "User with this email already exists");
-            }
 
-            // Create password hash
             var salt = BCrypt.Net.BCrypt.GenerateSalt();
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password, salt);
 
-            // Create new user
             var user = new User
             {
                 FirstName = firstName,
@@ -86,17 +72,11 @@ public class AuthenticationService : IAuthenticationService
                 IsActive = true
             };
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            await _userRepository.CreateAsync(user);
 
-            // Assign default "User" role
-            var userRole = await _context.Roles.FirstOrDefaultAsync(r => r.IsDefault == true);
-            if (userRole != null)
-            {
-                var userRoleAssignment = new UserRole(user.Id, userRole.Id);
-                _context.UserRoles.Add(userRoleAssignment);
-                await _context.SaveChangesAsync();
-            }
+            var defaultRole = await _roleRepository.GetDefaultRoleAsync();
+            if (defaultRole != null)
+                await _userRepository.AssignRoleAsync(user.Id, defaultRole.Id);
 
             return new AuthenticationResult(true, "Registration successful");
         }
@@ -114,49 +94,32 @@ public class AuthenticationService : IAuthenticationService
         return Task.CompletedTask;
     }
 
-    public bool HasRole(string roleName)
-    {
-        return _currentUserRoles.Contains(roleName, StringComparer.OrdinalIgnoreCase);
-    }
+    public bool HasRole(string roleName) =>
+        _currentUserRoles.Contains(roleName, StringComparer.OrdinalIgnoreCase);
 
-    public bool HasAnyRole(params string[] roleNames)
-    {
-        return roleNames.Any(role => HasRole(role));
-    }
+    public bool HasAnyRole(params string[] roleNames) =>
+        roleNames.Any(HasRole);
 
-    public bool HasAllRoles(params string[] roleNames)
-    {
-        return roleNames.All(role => HasRole(role));
-    }
+    public bool HasAllRoles(params string[] roleNames) =>
+        roleNames.All(HasRole);
 
     public async Task<bool> ChangePasswordAsync(string currentPassword, string newPassword)
     {
-        if (_currentUser == null)
-            return false;
-
+        if (_currentUser == null) return false;
         try
         {
             if (!BCrypt.Net.BCrypt.Verify(currentPassword, _currentUser.PasswordHash))
-            {
                 return false;
-            }
 
             var salt = BCrypt.Net.BCrypt.GenerateSalt();
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(newPassword, salt);
-
-            _currentUser.PasswordHash = hashedPassword;
+            _currentUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword, salt);
             _currentUser.PasswordSalt = salt;
             _currentUser.UpdatedAt = DateTime.UtcNow;
 
-            _context.Users.Update(_currentUser);
-            await _context.SaveChangesAsync();
-
+            await _userRepository.UpdateAsync(_currentUser);
             return true;
         }
-        catch
-        {
-            return false;
-        }
+        catch { return false; }
     }
 }
 
