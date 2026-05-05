@@ -5,17 +5,30 @@
              Title="List an Item">
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="10">
-            <Label Text="Title"/>
+
+            <Border BackgroundColor="#FFEBEE" Stroke="#F44336" StrokeThickness="1" Padding="15" IsVisible="{Binding HasError}">
+                <Border.StrokeShape><RoundRectangle CornerRadius="8" /></Border.StrokeShape>
+                <Label Text="{Binding ErrorMessage}" TextColor="#D32F2F" FontSize="14" />
+            </Border>
+
+            <Label Text="Title" FontAttributes="Bold"/>
             <Entry Text="{Binding Title}" Placeholder="Enter title"/>
-            <Label Text="Description"/>
+
+            <Label Text="Description" FontAttributes="Bold"/>
             <Editor Text="{Binding Description}" Placeholder="Describe your item" HeightRequest="100"/>
-            <Label Text="Daily Rate (£)"/>
+
+            <Label Text="Daily Rate (£)" FontAttributes="Bold"/>
             <Entry Text="{Binding DailyRate}" Keyboard="Numeric"/>
-            <Label Text="Category"/>
+
+            <Label Text="Category" FontAttributes="Bold"/>
             <Entry Text="{Binding Category}" Placeholder="e.g. Tools, Games"/>
-            <Label Text="Location"/>
+
+            <Label Text="Location" FontAttributes="Bold"/>
             <Entry Text="{Binding Location}" Placeholder="Your area"/>
-            <Button Text="List Item" Command="{Binding CreateItemCommand}" Margin="0,20,0,0"/>
+
+            <Button Text="List Item" Command="{Binding CreateItemCommand}" Margin="0,20,0,0"
+                    BackgroundColor="{StaticResource Primary}" TextColor="White"/>
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
