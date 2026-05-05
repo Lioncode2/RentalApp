@@ -8,10 +8,12 @@ namespace StarterApp.ViewModels;
 
 public partial class ItemsListViewModel : ObservableObject
 {
-    private readonly IItemRepository _itemRepo;
+    private readonly IItemRepository? _itemRepo;
 
-    [ObservableProperty] private ObservableCollection<Item> _items = new();
-    [ObservableProperty] private bool _isLoading;
+    [ObservableProperty] private ObservableCollection<Item> items = new();
+    [ObservableProperty] private bool isLoading;
+
+    public ItemsListViewModel() { }
 
     public ItemsListViewModel(IItemRepository itemRepo)
     {
@@ -21,9 +23,20 @@ public partial class ItemsListViewModel : ObservableObject
     [RelayCommand]
     public async Task LoadItemsAsync()
     {
+        if (_itemRepo == null) return;
         IsLoading = true;
-        var items = await _itemRepo.GetAllAsync();
-        Items = new ObservableCollection<Item>(items);
-        IsLoading = false;
+        try
+        {
+            var result = await _itemRepo.GetAllAsync();
+            Items = new ObservableCollection<Item>(result);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading items: {ex.Message}");
+        }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 }
