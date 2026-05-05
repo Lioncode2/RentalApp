@@ -3,8 +3,7 @@ using Microsoft.Extensions.Logging;
 using StarterApp.ViewModels;
 using StarterApp.Database.Data;
 using StarterApp.Views;
-using System.Diagnostics;
-using StarterApp.Services;
+using StarterApp.Database.Data.Repositories;
 
 namespace StarterApp;
 
@@ -21,15 +20,26 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
+        // Database
         builder.Services.AddDbContext<AppDbContext>();
 
+        // Repositories
+        builder.Services.AddScoped<IUserRepository, UserRepository>();
+        builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+        builder.Services.AddScoped<IItemRepository, ItemRepository>();
+        builder.Services.AddScoped<IRentalRepository, RentalRepository>();
+        builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+
+        // Services
         builder.Services.AddSingleton<IAuthenticationService, AuthenticationService>();
         builder.Services.AddSingleton<INavigationService, NavigationService>();
+        builder.Services.AddScoped<IRentalService, RentalService>();
+        builder.Services.AddScoped<ILocationService, LocationService>();
 
+        // Core ViewModels and Pages
         builder.Services.AddSingleton<AppShellViewModel>();
         builder.Services.AddSingleton<AppShell>();
         builder.Services.AddSingleton<App>();
-
         builder.Services.AddTransient<MainViewModel>();
         builder.Services.AddTransient<MainPage>();
         builder.Services.AddSingleton<LoginViewModel>();
@@ -43,22 +53,17 @@ public static class MauiProgram
         builder.Services.AddSingleton<TempViewModel>();
         builder.Services.AddTransient<TempPage>();
 
-        // Rental App Services
-        builder.Services.AddScoped<StarterApp.Database.Data.Repositories.IItemRepository, StarterApp.Database.Data.Repositories.ItemRepository>();
-        builder.Services.AddScoped<StarterApp.Database.Data.Repositories.IRentalRepository, StarterApp.Database.Data.Repositories.RentalRepository>();
-        builder.Services.AddScoped<StarterApp.Database.Data.Repositories.IReviewRepository, StarterApp.Database.Data.Repositories.ReviewRepository>();
-        builder.Services.AddScoped<StarterApp.Services.IRentalService, StarterApp.Services.RentalService>();
-        builder.Services.AddScoped<StarterApp.Services.ILocationService, StarterApp.Services.LocationService>();
-        builder.Services.AddTransient<StarterApp.ViewModels.ItemsListViewModel>();
-        builder.Services.AddTransient<StarterApp.ViewModels.CreateItemViewModel>();
-        builder.Services.AddTransient<StarterApp.ViewModels.RentalsViewModel>();
-        builder.Services.AddTransient<StarterApp.ViewModels.NearbyItemsViewModel>();
-        builder.Services.AddTransient<StarterApp.ViewModels.ReviewsViewModel>();
-        builder.Services.AddTransient<StarterApp.Views.ItemsListPage>();
-        builder.Services.AddTransient<StarterApp.Views.CreateItemPage>();
-        builder.Services.AddTransient<StarterApp.Views.RentalsPage>();
-        builder.Services.AddTransient<StarterApp.Views.NearbyItemsPage>();
-        builder.Services.AddTransient<StarterApp.Views.ReviewsPage>();
+        // Rental App ViewModels and Pages
+        builder.Services.AddTransient<ItemsListViewModel>();
+        builder.Services.AddTransient<CreateItemViewModel>();
+        builder.Services.AddTransient<RentalsViewModel>();
+        builder.Services.AddTransient<NearbyItemsViewModel>();
+        builder.Services.AddTransient<ReviewsViewModel>();
+        builder.Services.AddTransient<ItemsListPage>();
+        builder.Services.AddTransient<CreateItemPage>();
+        builder.Services.AddTransient<RentalsPage>();
+        builder.Services.AddTransient<NearbyItemsPage>();
+        builder.Services.AddTransient<ReviewsPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();
