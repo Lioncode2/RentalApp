@@ -15,12 +15,16 @@
                 <DataTemplate>
                     <Border Margin="15,8" Padding="15" StrokeThickness="1">
                         <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
-                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+                        <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto">
                             <Label Grid.Row="0" Grid.Column="0" Text="{Binding Title}" FontSize="16" FontAttributes="Bold"/>
                             <Label Grid.Row="0" Grid.Column="1" Text="{Binding DailyRate, StringFormat='£{0}/day'}" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
                             <Label Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding Description}" FontSize="13" TextColor="Gray" MaxLines="2"/>
                             <Label Grid.Row="2" Grid.Column="0" Text="{Binding Category}" FontSize="12" TextColor="Gray" Margin="0,5,0,0"/>
                             <Label Grid.Row="2" Grid.Column="1" Text="{Binding Location}" FontSize="12" TextColor="Gray" Margin="0,5,0,0"/>
+                            <Button Grid.Row="3" Grid.ColumnSpan="2" Text="Request Rental" Margin="0,10,0,0"
+                                    BackgroundColor="{StaticResource Primary}" TextColor="White"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RequestRentalCommand}"
+                                    CommandParameter="{Binding .}"/>
                         </Grid>
                     </Border>
                 </DataTemplate>
