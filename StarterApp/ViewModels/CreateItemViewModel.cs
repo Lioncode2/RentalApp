@@ -6,6 +6,7 @@ using StarterApp.Services;
 
 namespace StarterApp.ViewModels;
 
+// Handles the Create Item page where users list items for rent
 public partial class CreateItemViewModel : ObservableObject
 {
     private readonly IItemRepository? _itemRepo;
@@ -14,7 +15,8 @@ public partial class CreateItemViewModel : ObservableObject
 
     [ObservableProperty] private string title = string.Empty;
     [ObservableProperty] private string description = string.Empty;
-    [ObservableProperty] private decimal dailyRate;
+    // Using string so user can type any price - parsed to decimal on save
+    [ObservableProperty] private string dailyRateText = string.Empty;
     [ObservableProperty] private string category = string.Empty;
     [ObservableProperty] private string location = string.Empty;
     [ObservableProperty] private string errorMessage = string.Empty;
@@ -29,6 +31,8 @@ public partial class CreateItemViewModel : ObservableObject
         _navigationService = navigationService;
     }
 
+    // Validates input, creates the item and saves it to the database
+    // Adds random coordinates near Edinburgh for location-based search demo
     [RelayCommand]
     public async Task CreateItemAsync()
     {
@@ -39,15 +43,24 @@ public partial class CreateItemViewModel : ObservableObject
             HasError = true;
             return;
         }
+        if (!decimal.TryParse(DailyRateText, out decimal dailyRate))
+        {
+            ErrorMessage = "Please enter a valid daily rate";
+            HasError = true;
+            return;
+        }
         HasError = false;
         var item = new Item
         {
             Title = Title,
             Description = Description,
-            DailyRate = DailyRate,
+            DailyRate = dailyRate,
             Category = Category,
             Location = Location,
-            OwnerId = _authService?.CurrentUser?.Id ?? 0
+            OwnerId = _authService?.CurrentUser?.Id ?? 0,
+            // Random coordinates near Edinburgh for nearby search to work
+            Latitude = 55.9533 + (new Random().NextDouble() - 0.5) * 0.05,
+            Longitude = -3.1883 + (new Random().NextDouble() - 0.5) * 0.05
         };
         await _itemRepo.CreateAsync(item);
         await _navigationService!.NavigateBackAsync();

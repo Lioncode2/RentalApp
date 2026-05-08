@@ -1,4 +1,5 @@
 using StarterApp.ViewModels;
+using StarterApp.Database.Models;
 namespace StarterApp.Views;
 public partial class ItemsListPage : ContentPage
 {

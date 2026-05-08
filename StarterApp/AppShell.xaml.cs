@@ -8,6 +8,7 @@ public partial class AppShell : Shell
         BindingContext = viewModel;
         InitializeComponent();
         Routing.RegisterRoute("items", typeof(ItemsListPage));
+        Routing.RegisterRoute("itemdetail", typeof(ItemDetailPage));
         Routing.RegisterRoute("createitem", typeof(CreateItemPage));
         Routing.RegisterRoute("rentals", typeof(RentalsPage));
         Routing.RegisterRoute("nearby", typeof(NearbyItemsPage));

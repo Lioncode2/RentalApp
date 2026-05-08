@@ -1,8 +1,8 @@
 using StarterApp.ViewModels;
 namespace StarterApp.Views;
-public partial class NearbyItemsPage : ContentPage
+public partial class ItemDetailPage : ContentPage
 {
-    public NearbyItemsPage(NearbyItemsViewModel viewModel)
+    public ItemDetailPage(ItemDetailViewModel viewModel)
     {
         InitializeComponent();
         BindingContext = viewModel;

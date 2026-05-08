@@ -1,7 +1,7 @@
 using StarterApp.Database.Data.Repositories;
 using StarterApp.Database.Models;
 
-namespace StarterApp.Services;
+namespace StarterApp.Database.Services;
 
 // Service layer for all rental business logic
 // Keeps business rules out of the ViewModel and out of the database layer

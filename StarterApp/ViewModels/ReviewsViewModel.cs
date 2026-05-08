@@ -7,16 +7,28 @@ using System.Collections.ObjectModel;
 
 namespace StarterApp.ViewModels;
 
+// Handles the Reviews page
+// Allows users to submit star ratings and comments, and view existing reviews
 public partial class ReviewsViewModel : ObservableObject
 {
     private readonly IReviewRepository? _reviewRepo;
     private readonly IAuthenticationService? _authService;
 
+    // All reviews for the current item
     [ObservableProperty] private ObservableCollection<Review> reviews = new();
+
+    // Star rating selected by user (1 to 5)
     [ObservableProperty] private int rating = 5;
+
+    // Comment text typed by user
     [ObservableProperty] private string comment = string.Empty;
+
+    // Calculated average of all ratings for the item
     [ObservableProperty] private double averageRating;
+
+    // The item being reviewed - defaults to 1 for demo purposes
     [ObservableProperty] private int currentItemId = 1;
+
     [ObservableProperty] private bool isLoading;
 
     public ReviewsViewModel() { }
@@ -27,6 +39,7 @@ public partial class ReviewsViewModel : ObservableObject
         _authService = authService;
     }
 
+    // Loads all reviews for the current item and calculates average rating
     [RelayCommand]
     public async Task LoadReviewsAsync()
     {
@@ -48,6 +61,7 @@ public partial class ReviewsViewModel : ObservableObject
         }
     }
 
+    // Saves a new review to the database then reloads the list
     [RelayCommand]
     public async Task SubmitReviewAsync()
     {
