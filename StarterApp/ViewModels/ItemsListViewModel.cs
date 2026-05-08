@@ -7,17 +7,24 @@ using System.Collections.ObjectModel;
 
 namespace StarterApp.ViewModels;
 
+// Handles the Browse Items page
+// Loads all items from the database and handles rental requests
 public partial class ItemsListViewModel : ObservableObject
 {
     private readonly IItemRepository? _itemRepo;
     private readonly IRentalService? _rentalService;
     private readonly IAuthenticationService? _authService;
 
+    // List of items shown on screen - updates UI automatically when changed
     [ObservableProperty] private ObservableCollection<Item> items = new();
+
+    // Shows loading spinner while fetching data
     [ObservableProperty] private bool isLoading;
 
+    // Empty constructor needed for XAML
     public ItemsListViewModel() { }
 
+    // DI container calls this constructor and injects the services
     public ItemsListViewModel(IItemRepository itemRepo, IRentalService rentalService, IAuthenticationService authService)
     {
         _itemRepo = itemRepo;
@@ -25,6 +32,7 @@ public partial class ItemsListViewModel : ObservableObject
         _authService = authService;
     }
 
+    // Fetches all items from the database and displays them on screen
     [RelayCommand]
     public async Task LoadItemsAsync()
     {
@@ -45,6 +53,8 @@ public partial class ItemsListViewModel : ObservableObject
         }
     }
 
+    // Submits a rental request for the selected item
+    // RentalService handles the business rules like double booking and price calculation
     [RelayCommand]
     public async Task RequestRentalAsync(Item item)
     {
